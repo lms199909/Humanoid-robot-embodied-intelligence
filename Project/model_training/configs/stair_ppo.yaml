@@ -1,0 +1,34 @@
+# 楼梯训练默认超参(借鉴 TienKung-Lab 的 train config 命名)
+
+seed: 42
+device: cuda:0
+
+env:
+  task: stair
+  num_envs: 4096
+  episode_length_s: 20
+  domain_rand: true
+  physics_dt: 0.005
+  sim_dt: 0.05
+
+algorithm:
+  name: ppo
+  impl: rsl_rl          # QUESTIONS C1:rsl_rl 包装
+  # impl: native        # 切到自实现 PyTorch PPO
+  learning_rate: 1.0e-3
+  num_steps_per_env: 24
+  max_iterations: 1000
+
+mdp:
+  rewards:
+    stair_climb: 1.0
+    energy: -0.01
+    fall: -10.0
+  terminations:
+    fall_height: 0.3
+    fall_tilt_deg: 60.0
+    timeout_steps: 1000
+
+checkpoint:
+  save_every: 100
+  keep_last: 5

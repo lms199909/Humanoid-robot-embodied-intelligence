@@ -1,0 +1,28 @@
+# ROS 2 Topic/Service 集中定义(对齐 Readme §8.2)
+
+topics:
+  sensors:
+    head_rgbd: {name: /oli/sensors/head_rgbd, type: sensor_msgs/Image, qos: sensor, freq: 30}
+    chest_rgbd: {name: /oli/sensors/chest_rgbd, type: sensor_msgs/Image, qos: sensor, freq: 30}
+    imu: {name: /oli/sensors/imu, type: sensor_msgs/IMU, qos: sensor, freq: 1000}
+    joint_states: {name: /oli/sensors/joint_states, type: sensor_msgs/JointState, qos: sensor, freq: 1000}
+    ft_sensor: {name: /oli/sensors/ft_sensor, type: geometry_msgs/Wrench, qos: sensor, freq: 1000}
+  perception:
+    scene: {name: /oli/perception/scene, type: custom/SceneGraph, qos: reliable, freq: 10}
+    objects: {name: /oli/perception/objects, type: custom/ObjectList, qos: reliable, freq: 10}
+    robot_state: {name: /oli/perception/robot_state, type: custom/RobotState, qos: reliable, freq: 1000}
+  planning:
+    skill_seq: {name: /oli/planning/skill_seq, type: custom/SkillSequence, qos: reliable, freq: 1}
+  control:
+    trajectory: {name: /oli/control/trajectory, type: custom/Trajectory, qos: reliable, freq: 100}
+    joint_cmd: {name: /oli/control/joint_cmd, type: custom/JointCommand, qos: reliable, freq: 1000}
+  feedback:
+    status: {name: /oli/feedback/status, type: custom/ExecutionStatus, qos: reliable, freq: 100}
+    error: {name: /oli/feedback/error, type: custom/Error, qos: reliable, freq: 100}
+
+services:
+  - {name: /oli/llm/understand, type: custom/UnderstandInstruction}
+  - {name: /oli/llm/decompose, type: custom/TaskDecompose}
+  - {name: /oli/vlm/understand_scene, type: custom/UnderstandScene}
+  - {name: /oli/skill/execute, type: custom/SkillExecute}
+  - {name: /oli/control/replan, type: custom/Replan}

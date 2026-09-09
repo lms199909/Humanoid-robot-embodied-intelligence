@@ -1,0 +1,74 @@
+# 默认配置(所有模块都从这里读)
+# QUESTIONS B 决策:仿真平台与 G1DWAQ_Lab-main 一致,用 Isaac Sim + Isaac Lab
+
+project:
+  name: oli-embodied
+  workspace: ./
+
+robot:
+  # TODO: Oli URDF/SDK 拿到后填
+  dof: 31
+  control_freq_hz: 1000
+  joint_names: []  # 等 Oli 官方 joint 名
+  limits:
+    max_torque_nm: 150
+
+perception:
+  rgbd_topics:
+    head: /oli/sensors/head_rgbd
+    chest: /oli/sensors/chest_rgbd
+  imu_topic: /oli/sensors/imu
+  joint_state_topic: /oli/sensors/joint_states
+  output_scene_topic: /oli/perception/scene
+  freq_hz: 30
+
+simulation:
+  primary: isaac_sim          # 与 G1DWAQ_Lab-main 一致
+  fallback: mujoco           # 可选
+  isaac:
+    headless: true
+    gpu_id: 0
+    physics_dt: 0.005
+    rendering_dt: 0.0166
+  mujoco:
+    enabled: false            # 默认不启用
+    mjcf_path: ""
+
+planning:
+  skill_lib_path: ./common/skill_library.yaml
+  llm:
+    # QUESTIONS D1:同时支持 remote(云端)/ local(本地)两种调用
+    mode: remote              # remote | local
+    endpoint: ""              # remote: 云端 OpenAI-compatible;local: 127.0.0.1:8000
+    api_key: ""
+    api_key_env: OLI_LLM_API_KEY
+    model: gpt-4o-mini        # 切到 local 时换成 Qwen2.5 / LLaMA 等
+    timeout_s: 2.0
+    max_retries: 1
+  vlm:
+    mode: remote              # QUESTIONS D3:VLM 单独接口
+    endpoint: ""
+    api_key: ""
+    model: gpt-4o
+    timeout_s: 2.0
+
+control:
+  mpc_freq_hz: 100
+  wbc_freq_hz: 1000
+  servo_freq_hz: 2000
+
+safety:
+  enabled_levels: [L1, L2, L3, L4, L5]
+  estop_response_ms: 50
+
+# QUESTIONS C1/C2 决策:
+# 训练:rsl_rl 包装 + 自实现 PPO 双接口
+# 推理:ONNX + onnxruntime(详见 docs/INFERENCE_FORMATS.md)
+training:
+  algorithm:
+    impl: rsl_rl             # rsl_rl | native
+  inference:
+    format: onnx             # onnx | torchscript
+    backend: onnxruntime     # onnxruntime | tensorrt
+    opset: 17
+    quantize: false
